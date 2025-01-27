@@ -28,7 +28,7 @@ export const ProductosFormActionHandler = async (formData, id = null) => {
       descripcion: formData.get("descripcion") || "",
       categoria: formData.get("categoria") || "",
       precio,
-      imagen: formData.get("imagen"),
+      imagen: formData.get("imagen") || producto.imagen, // Usa la imagen existente si no hay una nueva
       descuento,
       precioDescuento,
     };
