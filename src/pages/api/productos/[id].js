@@ -110,4 +110,60 @@ export default async function handler(req, res) {
       res.status(500).json({ error: error.message });
     }
   }
+
+  if (method === "DELETE") {
+    try {
+      console.log("Iniciando eliminación de producto:", id);
+
+      const backendUrl = `http://localhost:2025/productos/${id}`;
+      console.log("URL del backend:", backendUrl);
+
+      const response = await fetch(backendUrl, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      const responseText = await response.text();
+      console.log("Respuesta raw del backend:", responseText);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (e) {
+        console.error("Error al parsear respuesta:", e);
+        responseData = { error: responseText };
+      }
+
+      if (!response.ok) {
+        console.error("Error del backend:", {
+          status: response.status,
+          data: responseData,
+        });
+
+        return res.status(response.status).json({
+          error: "Error al eliminar el producto",
+          details: responseData,
+          status: response.status,
+        });
+      }
+
+      console.log("Eliminación exitosa:", responseData);
+      return res.status(200).json({
+        message: "Producto eliminado exitosamente",
+        data: responseData,
+      });
+    } catch (error) {
+      console.error("Error en el proceso de eliminación:", {
+        message: error.message,
+        stack: error.stack,
+      });
+
+      return res.status(500).json({
+        error: "Error al procesar la eliminación",
+        details: error.message,
+      });
+    }
+  }
 }

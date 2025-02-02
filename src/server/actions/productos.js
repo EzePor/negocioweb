@@ -24,13 +24,13 @@ export const ProductosFormActionHandler = async (formData, id = null) => {
 
     // Crear objeto con datos validados
     const datosProducto = {
-      nombre: formData.get("nombre") || "",
-      descripcion: formData.get("descripcion") || "",
-      categoria: formData.get("categoria") || "",
-      precio,
-      imagen: formData.get("imagen") || producto.imagen, // Usa la imagen existente si no hay una nueva
-      descuento,
-      precioDescuento,
+      nombre: formData.get("nombre"),
+      descripcion: formData.get("descripcion"),
+      categoria: formData.get("categoria"),
+      precio: Number(formData.get("precio")),
+      imagen: formData.get("imagen"),
+      descuento: Number(formData.get("descuento")) || 0,
+      precioDescuento: Number(formData.get("precioDescuento")) || 0,
     };
 
     // Log detallado

@@ -1,11 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Link from "next/link";
 import { FaBars, FaTimes, FaShoppingCart, FaUserCircle } from "react-icons/fa";
+import { useCarrito } from "../context/CarritoContext";
+import { AuthContext } from "../context/AuthContext"; // Importamos el contexto de autenticación
 
-const NavBar = ({ cantidadTotal }) => {
+const NavBar = () => {
   const [isClick, setIsClick] = useState(true);
+  const { usuario, logout } = useContext(AuthContext); // Obtenemos usuario y logout del contexto
+  const cantidadTotal = useCarrito();
+
+  useEffect(() => {
+    console.log("Usuario en Navbar (useEffect):", usuario);
+  }, [usuario]);
 
   const handleNavBar = () => setIsClick(!isClick);
 
@@ -36,14 +44,17 @@ const NavBar = ({ cantidadTotal }) => {
           <ul className="hidden lg:flex space-x-8 text-white font-semibold">
             {[
               { name: "Productos", href: "/productos" },
-              { name: "Impresiones Fotográficas", href: "/imprimirFotos" },
               {
-                name: "Albumes y Portarreratos",
+                name: "Impresiones Fotográficas",
+                href: "/impresionesdigitales",
+              },
+              {
+                name: "Albumes y Portarretratos",
                 href: "/albumesPortarretratos",
               },
               { name: "Información", href: "/informacion" },
               { name: "Contacto", href: "/contacto" },
-              { name: "Admin", href: "productos/crearproducto" },
+              { name: "Admin", href: "/adminproductos" },
             ].map((item) => (
               <li key={item.name}>
                 <Link
@@ -68,9 +79,22 @@ const NavBar = ({ cantidadTotal }) => {
                 )}
               </div>
             </Link>
-            <Link href="/perfil" aria-label="Perfil de usuario">
-              <FaUserCircle className="text-white text-2xl" />
-            </Link>
+
+            {usuario ? (
+              <div className="text-white flex items-center space-x-4">
+                <span>{usuario.nombre}</span>
+                <button
+                  onClick={logout}
+                  className="bg-orange-600 px-3 py-1 rounded text-sm hover:bg-orange-500"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" aria-label="Perfil de usuario">
+                <FaUserCircle className="text-white text-2xl" />
+              </Link>
+            )}
           </div>
         </div>
       </nav>
@@ -81,13 +105,17 @@ const NavBar = ({ cantidadTotal }) => {
           <ul className="flex flex-col space-y-4 p-4">
             {[
               { name: "Productos", href: "/productos" },
-              { name: "Impresiones Fotográficas", href: "/imprimirFotos" },
+              {
+                name: "Impresiones Fotográficas",
+                href: "/impresionesdigitales",
+              },
               {
                 name: "Albumes y Portarreratos",
                 href: "/albumesPortarretratos",
               },
               { name: "Información", href: "/informacion" },
               { name: "Contacto", href: "/contacto" },
+              { name: "Admin", href: "/adminproductos" },
             ].map((item) => (
               <li key={item.name}>
                 <Link

@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useCarrito } from "../context/CarritoContext";
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState([]);
+  const { agregarAlCarrito, quitarDelCarrito, estaEnCarrito } = useCarrito();
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -21,33 +23,54 @@ export default function ProductosPage() {
   }, []);
 
   return (
-    <div className="container mx-auto px-4">
+    <div className="container mx-auto mt-20 px-4">
       <h1 className="text-2xl font-bold mb-4">Productos</h1>
-      <Link
-        href="/productos/crearproducto"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
-        Agregar Producto
-      </Link>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        {productos.map((producto) => (
-          <div key={producto._id} className="border p-4 rounded">
-            <h2 className="text-xl">{producto.nombre}</h2>
-            <img
-              src={producto.imagen}
-              alt={producto.nombre}
-              className="w-full h-48 object-cover"
-            />
-            <p>{producto.descripcion}</p>
-            <p>Precio: ${producto.precio}</p>
-            <Link className="text-blue-500" href={`https://web.whatsapp.com/`}>
+        {productos.map((producto) => {
+          const agregado = estaEnCarrito(producto._id);
+
+          return (
+            <div key={producto._id} className="border p-4 rounded relative">
+              <h2 className="text-xl">{producto.nombre}</h2>
               <img
-                src="https://img.icons8.com/color/48/000000/whatsapp--v1.png"
-                alt="whatsapp"
+                src={producto.imagen}
+                alt={producto.nombre}
+                className="w-full h-48 object-cover"
               />
-            </Link>
-          </div>
-        ))}
+              <p>{producto.descripcion}</p>
+              <p>Precio: ${producto.precio}</p>
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center mb-2">
+                {agregado ? (
+                  <button
+                    type="button"
+                    className="bg-red-500 text-white p-2 rounded-md"
+                    onClick={() => quitarDelCarrito(producto._id)}
+                  >
+                    Quitar del carrito
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="bg-orange-500 text-white p-2 rounded-md hover:transition-transform transform hover:scale-125 hover:bg-lime-700"
+                    onClick={() => agregarAlCarrito(producto)}
+                  >
+                    Agregar al carrito
+                  </button>
+                )}
+              </div>
+              <Link
+                className="text-blue-500"
+                href={`https://web.whatsapp.com/`}
+              >
+                <img
+                  src="https://img.icons8.com/color/48/000000/whatsapp--v1.png"
+                  alt="whatsapp"
+                />
+              </Link>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

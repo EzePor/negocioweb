@@ -184,24 +184,4 @@ export default async function handler(req, res) {
       });
     }
   }
-
-  if (method === "DELETE") {
-    try {
-      const { id } = req.query;
-      const data = JSON.parse(req.body);
-      console.log("Datos del producto recibidos: ", data);
-
-      const response = await fetch(`http://localhost:2025/productos/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-      const resultado = await response.json();
-      res.status(201).json({ success: true, data });
-    } catch (error) {
-      res.status(500).json({ error: "No se pudo eliminar el producto" });
-    }
-  }
 }

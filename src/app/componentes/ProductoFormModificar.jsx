@@ -37,6 +37,24 @@ export default function ProductoFormModificar({ id, handler }) {
 
   const formAction = async (formData) => {
     try {
+      // Verificar si hay nueva imagen
+      const imagenInput = formRef.current.querySelector('input[name="imagen"]');
+
+      // Si hay un archivo seleccionado, mantenerlo en el formData
+      // Si no hay archivo nuevo Y existe imagen previa, usar la imagen existente
+      if (!imagenInput.files[0] && producto.imagen) {
+        // Eliminar el campo de imagen vacío si existe
+        formData.delete("imagen");
+        // Agregar la URL de la imagen existente
+        formData.append("imagenExistente", producto.imagen);
+      }
+
+      console.log("FormData a enviar:", {
+        tieneImagenNueva: !!imagenInput.files[0],
+        tieneImagenExistente: !!producto.imagen,
+        campos: Array.from(formData.entries()),
+      });
+
       const response = await handler(formData, producto._id);
       console.log("Respuesta del servidor:", response);
 
@@ -50,6 +68,10 @@ export default function ProductoFormModificar({ id, handler }) {
       }
     } catch (error) {
       console.error("Error:", error);
+      Swal.fire({
+        text: "Error al actualizar el producto",
+        icon: "error",
+      });
     }
   };
 

@@ -1,6 +1,11 @@
+"use client";
+
 import { Geist, Geist_Mono } from "next/font/google";
+import { metadata } from "./metadata";
 import "./globals.css";
 import Navbar from "./componentes/NavBar";
+import { CarritoProvider } from "./context/CarritoContext";
+import { AuthProvider } from "./context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,11 +16,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-export const metadata = {
-  title: "Negocio Web",
-  description: "Página web de negocio",
-};
 
 export default function RootLayout({ children }) {
   return (
@@ -30,8 +30,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        {children}
+        <AuthProvider>
+          <CarritoProvider>
+            <Navbar />
+            {children}
+          </CarritoProvider>
+        </AuthProvider>
       </body>
     </html>
   );
