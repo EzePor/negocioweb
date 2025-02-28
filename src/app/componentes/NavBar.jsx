@@ -9,13 +9,27 @@ import { AuthContext } from "../context/AuthContext"; // Importamos el contexto 
 const NavBar = () => {
   const [isClick, setIsClick] = useState(true);
   const { usuario, logout } = useContext(AuthContext); // Obtenemos usuario y logout del contexto
-  const cantidadTotal = useCarrito();
+  const { cantidadTotal } = useCarrito();
+
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true); // Indica que el componente ya se montó en el cliente
     console.log("Usuario en Navbar (useEffect):", usuario);
   }, [usuario]);
 
   const handleNavBar = () => setIsClick(!isClick);
+
+  // Definimos las opciones del menú
+  const menuItems = [
+    { name: "Productos", href: "/productos" },
+    { name: "Impresiones Fotográficas", href: "/impresionesdigitales" },
+    { name: "Albumes y Portarretratos", href: "/albumesPortarretratos" },
+    { name: "Información", href: "/informacion" },
+    { name: "Contacto", href: "/contacto" },
+  ];
+
+  if (!mounted) return null; // Evita el render hasta que el cliente esté montado
 
   return (
     <header className="flex items-center justify-center">
@@ -42,20 +56,7 @@ const NavBar = () => {
 
           {/* Menú principal para pantallas grandes */}
           <ul className="hidden lg:flex space-x-8 text-white font-semibold">
-            {[
-              { name: "Productos", href: "/productos" },
-              {
-                name: "Impresiones Fotográficas",
-                href: "/impresionesdigitales",
-              },
-              {
-                name: "Albumes y Portarretratos",
-                href: "/albumesPortarretratos",
-              },
-              { name: "Información", href: "/informacion" },
-              { name: "Contacto", href: "/contacto" },
-              { name: "Admin", href: "/adminproductos" },
-            ].map((item) => (
+            {menuItems.map((item) => (
               <li key={item.name}>
                 <Link
                   href={item.href}
@@ -65,35 +66,56 @@ const NavBar = () => {
                 </Link>
               </li>
             ))}
+
+            {/* Opción "Admin" solo visible para usuarios con rol "admin" */}
+            {usuario?.rol === "admin" && (
+              <li>
+                <Link
+                  href="/adminproductos"
+                  className="text-yellow-400 font-bold hover:text-yellow-300"
+                >
+                  Admin
+                </Link>
+              </li>
+            )}
           </ul>
 
           {/* Íconos del carrito y usuario */}
           <div className="flex items-center space-x-6">
-            <Link href="/carrito" aria-label="Carrito de compras">
-              <div className="relative">
-                <FaShoppingCart className="text-white text-2xl" />
-                {cantidadTotal > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {cantidadTotal}
-                  </span>
-                )}
-              </div>
-            </Link>
+            {mounted && (
+              <>
+                <Link href="/carrito" aria-label="Carrito de compras">
+                  <div className="relative inline-block">
+                    <FaShoppingCart className="text-white text-2xl" />
+                    {cantidadTotal > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-bounce">
+                        {cantidadTotal}
+                      </span>
+                    )}
+                  </div>
+                </Link>
 
-            {usuario ? (
-              <div className="text-white flex items-center space-x-4">
-                <span>{usuario.nombre}</span>
-                <button
-                  onClick={logout}
-                  className="bg-orange-600 px-3 py-1 rounded text-sm hover:bg-orange-500"
-                >
-                  Cerrar Sesión
-                </button>
-              </div>
-            ) : (
-              <Link href="/login" aria-label="Perfil de usuario">
-                <FaUserCircle className="text-white text-2xl" />
-              </Link>
+                {usuario ? (
+                  <div className="text-white flex items-center space-x-4">
+                    <span>{usuario.nombre}</span>
+                    <button
+                      onClick={logout}
+                      className="bg-orange-600 px-3 py-1 rounded text-sm hover:bg-orange-500"
+                    >
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                ) : (
+                  <Link href="/login" aria-label="Perfil de usuario">
+                    <div className="flex items-center space-x-4">
+                      <FaUserCircle className="text-white text-2xl" />
+                      <span className="bg-lime-600 px-3 py-1 text-white rounded text-sm hover:bg-lime-500">
+                        Iniciar sesión
+                      </span>
+                    </div>
+                  </Link>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -103,20 +125,7 @@ const NavBar = () => {
       {!isClick && (
         <div className="fixed top-16 left-0 w-full bg-zinc-900 text-white z-40">
           <ul className="flex flex-col space-y-4 p-4">
-            {[
-              { name: "Productos", href: "/productos" },
-              {
-                name: "Impresiones Fotográficas",
-                href: "/impresionesdigitales",
-              },
-              {
-                name: "Albumes y Portarreratos",
-                href: "/albumesPortarretratos",
-              },
-              { name: "Información", href: "/informacion" },
-              { name: "Contacto", href: "/contacto" },
-              { name: "Admin", href: "/adminproductos" },
-            ].map((item) => (
+            {menuItems.map((item) => (
               <li key={item.name}>
                 <Link
                   href={item.href}
@@ -127,6 +136,19 @@ const NavBar = () => {
                 </Link>
               </li>
             ))}
+
+            {/* Opción "Admin" solo visible para admin en menú móvil */}
+            {usuario?.rol === "admin" && (
+              <li>
+                <Link
+                  href="/adminproductos"
+                  className="block py-2 px-4 text-yellow-400 font-bold hover:bg-yellow-500 rounded"
+                  onClick={handleNavBar}
+                >
+                  Admin
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
       )}

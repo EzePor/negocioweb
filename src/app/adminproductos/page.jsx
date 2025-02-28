@@ -1,10 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Link from "next/link";
+import { AuthContext } from "../context/AuthContext";
 
 export default function AdminProductosPage() {
   const [productos, setProductos] = useState([]);
+  const { usuario } = useContext(AuthContext);
+
+  // Redirigir si el usuario no está autenticado o no tiene rol de admin
+  useEffect(() => {
+    if (!usuario || usuario.rol !== "admin") {
+      window.Location.href = "/login"; // Redirigir a login si no es admin
+    }
+  }, [usuario]);
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -19,6 +28,11 @@ export default function AdminProductosPage() {
 
     fetchProductos();
   }, []);
+
+  // Mientras se verifica la autenticación, mostrar un loader o nada
+  if (!usuario || usuario.rol !== "admin") {
+    return <p className="text-center mt-20 text-lg">Redirigiendo...</p>;
+  }
 
   return (
     <div className="container  mx-auto mt-20 px-4">

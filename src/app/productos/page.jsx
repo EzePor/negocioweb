@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import Link from "next/link";
 import { useCarrito } from "../context/CarritoContext";
+import { AuthContext } from "../context/AuthContext";
 
 export default function ProductosPage() {
   const [productos, setProductos] = useState([]);
   const { agregarAlCarrito, quitarDelCarrito, estaEnCarrito } = useCarrito();
+  const { usuario } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProductos = async () => {
@@ -39,26 +41,33 @@ export default function ProductosPage() {
                 className="w-full h-48 object-cover"
               />
               <p>{producto.descripcion}</p>
-              <p>Precio: ${producto.precio}</p>
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center mb-2">
-                {agregado ? (
-                  <button
-                    type="button"
-                    className="bg-red-500 text-white p-2 rounded-md"
-                    onClick={() => quitarDelCarrito(producto._id)}
-                  >
-                    Quitar del carrito
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    className="bg-orange-500 text-white p-2 rounded-md hover:transition-transform transform hover:scale-125 hover:bg-lime-700"
-                    onClick={() => agregarAlCarrito(producto)}
-                  >
-                    Agregar al carrito
-                  </button>
-                )}
-              </div>
+
+              {usuario ? (
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center mb-2">
+                  <span className="text-lg font-bold mr-2">
+                    {producto.precio}
+                  </span>
+                  {agregado ? (
+                    <button
+                      type="button"
+                      className="bg-red-500 text-white p-2 rounded-md"
+                      onClick={() => quitarDelCarrito(producto._id)}
+                    >
+                      Quitar del carrito
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="bg-orange-500 text-white p-2 rounded-md hover:transition-transform transform hover:scale-125 hover:bg-lime-700"
+                      onClick={() => agregarAlCarrito(producto)}
+                    >
+                      Agregar al carrito
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <p></p>
+              )}
               <Link
                 className="text-blue-500"
                 href={`https://web.whatsapp.com/`}

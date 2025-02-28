@@ -8,32 +8,17 @@ export const AuthProvider = ({ children }) => {
   console.log("AuthProvider montado"); // ✅ Esto debe aparecer en la consola
   const [usuario, setUsuario] = useState(null);
   const [token, setToken] = useState(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      console.log("🟡 Ejecutando useEffect en AuthProvider...");
-      console.log(
-        "📦 localStorage antes de obtener datos:",
-        localStorage.getItem("usuario")
-      );
+    setIsClient(true);
 
-      const storedUser = JSON.parse(localStorage.getItem("usuario"));
-      const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("usuario");
+    const storedToken = localStorage.getItem("token");
 
-      if (storedUser && storedToken) {
-        console.log(
-          "🟢 Datos en localStorage -> usuario:",
-          storedUser,
-          "token:",
-          storedToken
-        );
-        setUsuario(storedUser);
-        setToken(storedToken);
-      } else {
-        console.warn(
-          "⚠️ No hay datos en localStorage después de montar AuthProvider"
-        );
-      }
+    if (storedUser && storedToken) {
+      setUsuario(JSON.parse(storedUser));
+      setToken(storedToken);
     }
   }, []);
 
@@ -60,6 +45,7 @@ export const AuthProvider = ({ children }) => {
           console.log("✅ Guardando en localStorage...");
           localStorage.setItem("usuario", JSON.stringify(data.usuario));
           localStorage.setItem("token", data.token);
+          window.location.href = "/productos"; // Redirigir a la página principal
         }
 
         setUsuario(data.usuario);
