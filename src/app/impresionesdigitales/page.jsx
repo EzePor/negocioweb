@@ -1,35 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import SubirFotos from "../componentes/SubirFotos";
 import ListarFotos from "../componentes/ListarFotos";
-import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 
-const MisFotos = () => {
+const FotosUsuario = () => {
   const [actualizar, setActualizar] = useState(false);
-  const usuarioId = "ID_DEL_USUARIO"; // Aquí debes reemplazarlo con el ID real del usuario autenticado
-  const { usuario } = useContext(AuthContext);
+  const { usuario, cargandoAuth } = useContext(AuthContext);
+  console.log("📸 Renderizando FotosUsuario...", { usuario, cargandoAuth });
 
   useEffect(() => {
-    if (!usuario) {
-      // Redirigir si no está autenticado
-      window.location.href = "/login";
-    }
+    const verificarAuth = async () => {
+      try {
+        const storedUserData = localStorage.getItem("usuario");
+        if (!usuario && !storedUserData) {
+          window.location.href = "/login";
+        }
+      } catch (error) {
+        console.error("Error al verificar autenticación:", error);
+        window.location.href = "/login";
+      }
+    };
+
+    verificarAuth();
   }, [usuario]);
 
-  if (!usuario) return <p>Cargando...</p>;
-
+  if (cargandoAuth) {
+    return <div>Cargando...</div>;
+  }
   return (
-    <div>
-      <h1>Subir y Administrar Fotos</h1>
-      <SubirFotos
-        usuarioId={usuarioId}
-        onUploadSuccess={() => setActualizar(!actualizar)}
-      />
-      <ListarFotos usuarioId={usuarioId} key={actualizar} />
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center mb-8">
+        Subir y Administrar Fotos
+      </h1>
+
+      <SubirFotos onUploadSuccess={() => setActualizar(!actualizar)} />
+      <ListarFotos key={actualizar} />
     </div>
   );
 };
 
-export default MisFotos;
+export default FotosUsuario;
